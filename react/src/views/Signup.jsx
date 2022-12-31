@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axiosClient from '../axios-client'
 import { useStateContext } from '../contexts/ContextProvider'
@@ -9,6 +9,7 @@ const Signup = () => {
   const passwordRef = useRef()
   const passwordConfirmationRef = useRef()
 
+  const [errors, setErrors] = useState(null)
   const {setUser, setToken} = useStateContext()
 
   const onSubmit = (event) => {
@@ -20,13 +21,13 @@ const Signup = () => {
       password_confirmation: passwordConfirmationRef.current.value 
     }
 
-    axiosClient.post('/signup', payload).then((data) => {
+    axiosClient.post('/signup', payload).then(({data}) => {
       setUser(data.user)
       setToken(data.token)
-    }).then(err => {
+    }).catch(err => {
       const response = err.response
-      if(response == 422){
-        console.log(response.data.errors)
+      if(response.status == 422){
+        setErrors(response.data.errors)
       }
     })
   }
@@ -36,10 +37,17 @@ const Signup = () => {
         <div className="form">
             <form onSubmit={onSubmit}>
                 <h1 className='title'>Signup for free</h1>
+                {errors && 
+                  <div className='alert'>
+                    {Object.keys(errors).map(key => (
+                      <p key={key}>{errors[key][0]}</p>
+                    ))}
+                  </div>}
+
                 <input placeholder='Full Name' ref={nameRef} />
                 <input type="email" placeholder='Email Address' ref={emailRef} />
-                <input type="password" placeholder='Password' ref={passwordRef} />
-                <input type="password" placeholder='Password Confirmation' ref={passwordConfirmationRef} />
+                <input type="password" placeholder='Password' ref={passwordRef} value="1234@Afsal" />
+                <input type="password" placeholder='Password Confirmation' ref={passwordConfirmationRef} value="1234@Afsal" />
                 <button className="btn btn-block">Signup</button>
                 <p className='message'>
                     Already Registered? <Link to='/login'>Sign in</Link>
