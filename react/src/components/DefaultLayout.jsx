@@ -6,7 +6,7 @@ import { useStateContext } from '../contexts/ContextProvider'
 
 export const DefaultLayout = () => {
 
-    const {user, token, setUser, setToken} = useStateContext()
+    const {user, token, notification, setUser, setToken} = useStateContext()
 
     if(!token){
         return <Navigate to="/login" />
@@ -35,6 +35,9 @@ export const DefaultLayout = () => {
             <Link to="/users">Users</Link>
         </aside>
         <div className="content">
+            {notification && (
+                <div className="notification">{notification}</div>
+            )}
             <header>
                 <div className="">
                     header
@@ -43,10 +46,11 @@ export const DefaultLayout = () => {
                     {user.name}
                     <a href="#" className='btn-logout' onClick={onLogout} >Logout</a>
                 </div>
-                <main>   
-                    <Outlet />
-                </main>
             </header>
+            <main>   
+                <Outlet />
+            </main>
+        
         </div>
     </div>
   )
